@@ -190,7 +190,7 @@ if __name__ == "__main__":
             noisy = noise_scheduler.add_noise(batch, noise, timesteps)
             noise_pred = model(noisy, timesteps)
             loss = F.mse_loss(noise_pred, noise)
-            loss.backward(loss)
+            loss.backward()
 
             nn.utils.clip_grad_norm_(model.parameters(), 1.0)
             optimizer.step()
