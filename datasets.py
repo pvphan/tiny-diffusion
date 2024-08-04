@@ -54,6 +54,12 @@ def dino_dataset(n=8000):
     return TensorDataset(torch.from_numpy(X.astype(np.float32)))
 
 
+def teapot_dataset(n=16000):
+    # https://users.cs.utah.edu/~dejohnso/models/teapot_bezier0.tris
+    X = np.genfromtxt("static/teapot_bezier0.tris", delimiter=" ", skip_header=1)
+    return TensorDataset(torch.from_numpy(X.astype(np.float32)))
+
+
 def get_dataset(name, n=8000):
     if name == "moons":
         return moons_dataset(n)
@@ -63,5 +69,12 @@ def get_dataset(name, n=8000):
         return line_dataset(n)
     elif name == "circle":
         return circle_dataset(n)
+    elif name == "teapot":
+        return teapot_dataset(n)
     else:
         raise ValueError(f"Unknown dataset: {name}")
+
+
+if __name__ == "__main__":
+    teapot_dataset = get_dataset("teapot")
+    breakpoint()
