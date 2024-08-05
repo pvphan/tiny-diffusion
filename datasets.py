@@ -56,7 +56,7 @@ def dino_dataset(n=8000):
 
 def teapot_dataset(n=16000):
     # https://users.cs.utah.edu/~dejohnso/models/teapot_bezier0.tris
-    X = np.genfromtxt("static/teapot_bezier0.tris", delimiter=" ", skip_header=1)
+    X = np.genfromtxt("static/teapot_bezier1.tris", delimiter=" ", skip_header=1)
     return TensorDataset(torch.from_numpy(X.astype(np.float32)))
 
 
