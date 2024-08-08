@@ -26,10 +26,10 @@ class Block(nn.Module):
 
 
 class MLP(nn.Module):
-    def __init__(self, hidden_size: int = 128, hidden_layers: int = 3, emb_size: int = 128,
+    def __init__(self, num_dims: int, hidden_size: int = 128, hidden_layers: int = 3, emb_size: int = 128,
                  time_emb: str = "sinusoidal", input_emb: str = "sinusoidal"):
         super().__init__()
-        self.num_dims = 3
+        self.num_dims = num_dims
         self.time_mlp = PositionalEmbedding(emb_size, time_emb)
         self.input_mlps = [
             PositionalEmbedding(emb_size, input_emb, scale=25.0)
@@ -159,7 +159,9 @@ if __name__ == "__main__":
     dataloader = DataLoader(
         dataset, batch_size=config.train_batch_size, shuffle=True, drop_last=True)
 
+    num_dims = dataset.tensors[0].shape[1]
     model = MLP(
+        num_dims=num_dims,
         hidden_size=config.hidden_size,
         hidden_layers=config.hidden_layers,
         emb_size=config.embedding_size,
@@ -209,7 +211,7 @@ if __name__ == "__main__":
         if epoch % config.save_images_step == 0 or epoch == config.num_epochs - 1:
             # generate data with the model to later visualize the learning process
             model.eval()
-            sample = torch.randn(config.eval_batch_size, model.num_dims)
+            sample = torch.randn(config.eval_batch_size, num_dims)
             timesteps = list(range(len(noise_scheduler)))[::-1]
             for i, t in enumerate(tqdm(timesteps)):
                 t = torch.from_numpy(np.repeat(t, config.eval_batch_size)).long()
