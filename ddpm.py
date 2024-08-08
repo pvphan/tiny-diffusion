@@ -1,3 +1,6 @@
+"""
+python ddpm.py --experiment_name teapot_experiment --dataset teapot --eval_batch_size 10000 --hidden_layers 3 --num_epochs 200 --learning_rate 0.001 --train_batch_size 1024 --hidden_size 256
+"""
 import argparse
 import os
 
