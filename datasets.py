@@ -64,6 +64,10 @@ def teapot_dataset(n=16000):
     else:
         indices = np.random.choice(X_unique.shape[0], size=n, replace=False)
         X = X_unique[indices, :]
+
+    # dataset should be centered about origin
+    teapot_center = np.array([0, 1.5, 0])
+    X -= teapot_center
     return TensorDataset(torch.from_numpy(X.astype(np.float32)))
 
 
