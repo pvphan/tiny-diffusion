@@ -55,8 +55,15 @@ def dino_dataset(n=8000):
 
 
 def teapot_dataset(n=16000):
+    # ~10000 unique points
     # https://users.cs.utah.edu/~dejohnso/models/teapot_bezier1.tris
-    X = np.genfromtxt("static/teapot_bezier1.tris", delimiter=" ", skip_header=1)
+    X_raw = np.genfromtxt("static/teapot_bezier1.tris", delimiter=" ", skip_header=1)
+    X_unique = np.unique(X_raw, axis=0)
+    if X_unique.shape[0] < n:
+        X = X_unique
+    else:
+        indices = np.random.choice(n, size=n, replace=False)
+        X = X_unique[indices, :]
     return TensorDataset(torch.from_numpy(X.astype(np.float32)))
 
 
@@ -77,4 +84,4 @@ def get_dataset(name, n=8000):
 
 if __name__ == "__main__":
     teapot_dataset = get_dataset("teapot")
-    breakpoint()
+    print(teapot_dataset.tensors[0].shape)
