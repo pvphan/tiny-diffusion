@@ -1,3 +1,10 @@
+"""
+TODO:
+- Train on GPU, measure experiment speed up for teapot.
+- Catalog experiments more thoughtfully, visualize in rerun.
+    - Dimensions to change: learning_rate, num_timesteps, embedding_size, hidden_size, hidden_layers
+- Build catalog of experiments.
+"""
 import time
 
 import numpy as np

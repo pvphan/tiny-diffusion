@@ -225,19 +225,22 @@ if __name__ == "__main__":
     os.makedirs(outdir, exist_ok=True)
     torch.save(model.state_dict(), f"{outdir}/model.pth")
 
-    print("Saving images...")
-    imgdir = f"{outdir}/images"
-    os.makedirs(imgdir, exist_ok=True)
-    frames = np.stack(frames)
-    xmin, xmax = -6, 6
-    ymin, ymax = -6, 6
-    for i, frame in enumerate(frames):
-        plt.figure(figsize=(10, 10))
-        plt.scatter(frame[:, 0], frame[:, 1])
-        plt.xlim(xmin, xmax)
-        plt.ylim(ymin, ymax)
-        plt.savefig(f"{imgdir}/{i:04}.png")
-        plt.close()
+
+    save_images = False
+    if save_images:
+        print("Saving images...")
+        imgdir = f"{outdir}/images"
+        os.makedirs(imgdir, exist_ok=True)
+        frames = np.stack(frames)
+        xmin, xmax = -6, 6
+        ymin, ymax = -6, 6
+        for i, frame in enumerate(frames):
+            plt.figure(figsize=(10, 10))
+            plt.scatter(frame[:, 0], frame[:, 1])
+            plt.xlim(xmin, xmax)
+            plt.ylim(ymin, ymax)
+            plt.savefig(f"{imgdir}/{i:04}.png")
+            plt.close()
 
     print("Saving loss as numpy array...")
     np.save(f"{outdir}/loss.npy", np.array(losses))
