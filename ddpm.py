@@ -29,24 +29,27 @@ class MLP(nn.Module):
     def __init__(self, hidden_size: int = 128, hidden_layers: int = 3, emb_size: int = 128,
                  time_emb: str = "sinusoidal", input_emb: str = "sinusoidal"):
         super().__init__()
-
+        self.num_dims = 3
         self.time_mlp = PositionalEmbedding(emb_size, time_emb)
-        self.input_mlp1 = PositionalEmbedding(emb_size, input_emb, scale=25.0)
-        self.input_mlp2 = PositionalEmbedding(emb_size, input_emb, scale=25.0)
+        self.input_mlps = [
+            PositionalEmbedding(emb_size, input_emb, scale=25.0)
+            for _ in range(self.num_dims)
+        ]
 
-        concat_size = len(self.time_mlp.layer) + \
-            len(self.input_mlp1.layer) + len(self.input_mlp2.layer)
+        concat_size = (
+            len(self.time_mlp.layer)
+            + sum(len(input_mlp.layer) for input_mlp in self.input_mlps)
+        )
         layers = [nn.Linear(concat_size, hidden_size), nn.GELU()]
         for _ in range(hidden_layers):
             layers.append(Block(hidden_size))
-        layers.append(nn.Linear(hidden_size, 2))
+        layers.append(nn.Linear(hidden_size, self.num_dims))
         self.joint_mlp = nn.Sequential(*layers)
 
     def forward(self, x, t):
-        x1_emb = self.input_mlp1(x[:, 0])
-        x2_emb = self.input_mlp2(x[:, 1])
+        dimension_embeddings = [self.input_mlps[i](x[:, i]) for i in range(self.num_dims)]
         t_emb = self.time_mlp(t)
-        x = torch.cat((x1_emb, x2_emb, t_emb), dim=-1)
+        x = torch.cat((*dimension_embeddings, t_emb), dim=-1)
         x = self.joint_mlp(x)
         return x
 
@@ -137,7 +140,7 @@ class NoiseScheduler():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--experiment_name", type=str, default="base")
-    parser.add_argument("--dataset", type=str, default="dino", choices=["circle", "dino", "line", "moons"])
+    parser.add_argument("--dataset", type=str, default="dino", choices=["circle", "dino", "line", "moons", "teapot"])
     parser.add_argument("--train_batch_size", type=int, default=32)
     parser.add_argument("--eval_batch_size", type=int, default=1000)
     parser.add_argument("--num_epochs", type=int, default=200)
@@ -206,7 +209,7 @@ if __name__ == "__main__":
         if epoch % config.save_images_step == 0 or epoch == config.num_epochs - 1:
             # generate data with the model to later visualize the learning process
             model.eval()
-            sample = torch.randn(config.eval_batch_size, 2)
+            sample = torch.randn(config.eval_batch_size, model.num_dims)
             timesteps = list(range(len(noise_scheduler)))[::-1]
             for i, t in enumerate(tqdm(timesteps)):
                 t = torch.from_numpy(np.repeat(t, config.eval_batch_size)).long()
