@@ -62,7 +62,7 @@ def teapot_dataset(n=16000):
     if X_unique.shape[0] < n:
         X = X_unique
     else:
-        indices = np.random.choice(n, size=n, replace=False)
+        indices = np.random.choice(X_unique.shape[0], size=n, replace=False)
         X = X_unique[indices, :]
     return TensorDataset(torch.from_numpy(X.astype(np.float32)))
 

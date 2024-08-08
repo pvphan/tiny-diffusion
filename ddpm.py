@@ -155,7 +155,7 @@ if __name__ == "__main__":
     parser.add_argument("--save_images_step", type=int, default=1)
     config = parser.parse_args()
 
-    dataset = datasets.get_dataset(config.dataset)
+    dataset = datasets.get_dataset(config.dataset, 16_000)
     dataloader = DataLoader(
         dataset, batch_size=config.train_batch_size, shuffle=True, drop_last=True)
 
